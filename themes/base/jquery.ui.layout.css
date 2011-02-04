@@ -1,0 +1,106 @@
+.ui-layout{
+  position: relative;
+  overflow: hidden;
+  border: none;
+}
+.ui-layout.ui-layout-pane{
+  border: none;
+}
+.ui-layout-pane{
+  position: absolute;
+}
+.ui-layout-pane-east{
+  margin-left:16px;
+  right: 0;
+  top:0;
+}
+.ui-layout-pane-west{
+  margin-right:16px;
+  left: 0;
+  top:0;
+}
+.ui-layout-pane-east.ui-layout-pane-sliding.ui-layout-pane-open{
+  padding-left: 16px;
+}
+
+.ui-layout-pane-west.ui-layout-pane-sliding.ui-layout-pane-open{
+  padding-right: 16px;
+}
+
+.ui-layout-pane-north{
+  margin-bottom:16px;
+  top: 0;
+  left: 0;
+}
+.ui-layout-pane-south{
+  margin-top:16px;
+  bottom: 0;
+  left: 0;
+}
+.ui-layout-pane-north.ui-layout-pane-sliding.ui-layout-pane-open{
+  padding-bottom: 16px;
+}
+.ui-layout-pane-south.ui-layout-pane-sliding.ui-layout-pane-open{
+  padding-top: 16px;
+}
+
+
+
+.ui-layout-pane .ui-resizable-handle{
+  position: absolute;
+  z-index: inherit;
+}
+.ui-resizable-w, .ui-resizable-e {
+  width: 16px;
+  height: 100%;
+  top: 0;
+}
+.ui-resizable-e{
+  right:-17px;
+}
+
+.ui-layout-pane-sliding.ui-layout-pane-open > .ui-resizable-e{
+  right:0;
+}
+
+.ui-layout-pane-sliding.ui-layout-pane-open > .ui-resizable-w{
+  left:0;
+}
+
+.ui-resizable-w{
+  left:-17px;
+}
+
+.ui-resizable-s, .ui-resizable-n {
+  height: 16px;
+  width: 100%;
+  left: 0;
+}
+.ui-resizable-n{
+  top:-17px;
+}
+
+.ui-resizable-s{
+  bottom:-17px;
+}
+
+.ui-layout-pane-sliding.ui-layout-pane-open > .ui-resizable-n{
+  top:0;
+}
+.ui-layout-pane-sliding.ui-layout-pane-open > .ui-resizable-s{
+  bottom:0;
+}
+
+
+.ui-resizable-handle .ui-icon{
+  position: absolute;
+}
+
+.ui-resizable-w .ui-icon, .ui-resizable-e .ui-icon{
+  top: 50%;
+  margin-top: -8px;
+}
+.ui-resizable-n .ui-icon, .ui-resizable-s .ui-icon{
+  left: 50%;
+  margin-left: -8px;
+}

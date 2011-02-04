@@ -1,0 +1,63 @@
+<html>
+  <HEAD>
+    <TITLE>Nested layout Example</TITLE>
+    <link type="text/css" href="../../themes/base/jquery.ui.all.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../../themes/base/jquery.ui.all.css">
+    <script src="../../jquery-1.4.4.js"></script>
+    <script src="../../ui/jquery.ui.core.js"></script>
+    <script src="../../ui/jquery.ui.widget.js"></script>
+    <script src="../../ui/jquery.ui.mouse.js"></script>
+    <script src="../../ui/jquery.ui.resizable.js"></script>
+    <script src="../../ui/jquery.ui.position.js"></script>
+    <script src="../../ui/jquery.ui.layout.js"></script>
+    <script src="../../ui/jquery.ui.button.js"></script>    
+    <link rel="stylesheet" href="../demos.css">
+    <script type="text/javascript">
+
+      $(document).ready(function () {
+        var $outer_layout = $('#outer-layout').layout({west: {sliding: true}});
+        var $inner_layout = $('#inner-layout').layout({type:'vertical', north: {sliding: true}});
+        $('.ui-layout-pane-west .toggleSlide').button().click(function(e){
+          e.preventDefault();
+          $outer_layout.layout('toggleSlide', 'west')
+        });
+        $inner_layout.bind('layoutnorthopen', function(e,data){
+          var self = $inner_layout.data('layout')
+          self.options[data.name].height = self.panes['center'].outerHeight()+17
+        });
+
+      });
+    </script>
+    <style>
+      body{
+        height: 100%;
+        width: 100%;
+        padding:0;
+        margin:0;
+      }
+      .ui-layout-pane div.content{
+        text-align: center;
+        height: 100%;
+        overflow:hidden;
+      }
+      a.toggleSlide.ui-button.ui-widget {
+        font-size: 75%;
+      }
+    </style>
+  </HEAD>
+  <body>
+    <div id="outer-layout">
+      <div class="ui-layout-pane-west">
+        <div class="content">
+          <a href="nested.html#" class="toggleSlide">Toggle slide</a>
+          <div>Outer layout west</div>
+        </div>
+      </div>
+      <div id="inner-layout" class="ui-layout-pane-center">
+        <div class="ui-layout-pane-north"><div class="content">Inner layout North</div></div>
+        <div class="ui-layout-pane-center"><div class="content">Inner layout Center </div></div>
+        <div class="ui-layout-pane-south"><div class="content">Inner layout South</div></div>
+      </div>
+    </div>
+  </body>
+</html>
