@@ -59,19 +59,19 @@
 
 .ui-layout-pane-west.ui-layout-pane-sliding.ui-layout-pane-hiding,
 .ui-layout-pane-west.ui-layout-pane-close.ui-layout-pane-hiding{
-  margin-right: 0;
+  margin-right: 1px;
 }
 .ui-layout-pane-east.ui-layout-pane-sliding.ui-layout-pane-hiding,
 .ui-layout-pane-east.ui-layout-pane-close.ui-layout-pane-hiding{
-  margin-left: 0;
+  margin-left: 1px;
 }
 .ui-layout-pane-north.ui-layout-pane-sliding.ui-layout-pane-hiding,
 .ui-layout-pane-north.ui-layout-pane-close.ui-layout-pane-hiding{
-  margin-bottom: 0;
+  margin-bottom: 1px;
 }
 .ui-layout-pane-south.ui-layout-pane-sliding.ui-layout-pane-hiding,
 .ui-layout-pane-south.ui-layout-pane-close.ui-layout-pane-hiding{
-  margin-bottom: 0;
+  margin-bottom: 1px;
 }
 
 

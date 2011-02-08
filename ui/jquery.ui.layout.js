@@ -195,7 +195,7 @@
             self._sliding(pane)
             $pane[self._sizeProp(pane)](0);
             self._closed(pane);
-            self._putForeground(pane);
+
           }
           else if (self.options[pane].opened){
             self._open(pane, false);
@@ -303,10 +303,8 @@
     _sliding: function(pane, sliding){
       sliding = ("undefined" == typeof sliding) ? true : sliding;
       this.panes[pane][sliding ? 'addClass' : 'removeClass']('ui-layout-pane-sliding');
-    },
-    _hiding: function(pane, hiding){
-      hiding = ("undefined" == typeof hiding) ? false : hiding;
-      this.panes[pane][hiding ? 'addClass' : 'removeClass']('ui-layout-pane-hiding');
+      if (sliding)
+        this._putForeground(pane);
     },
     toggleSlide: function(pane){
       this.options[pane].sliding = !this.options[pane].sliding;
@@ -314,6 +312,10 @@
       this.resize();
       return this.element
     },
+    _hiding: function(pane, hiding){
+      hiding = ("undefined" == typeof hiding) ? false : hiding;
+      this.panes[pane][hiding ? 'addClass' : 'removeClass']('ui-layout-pane-hiding');
+    },    
     _ui:function(pane){
       return {pane: this.panes[pane], paneName: pane, options: this.options}
     },

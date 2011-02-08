@@ -14,12 +14,12 @@
     <link rel="stylesheet" href="../demos.css">
     <script type="text/javascript">
 
-      $(document).ready(function () {
-        var $outer_layout = $('#outer-layout').layout({west: {sliding: true, hiding: true}});
+      $(function () {
+        var $outer_layout = $('#outer-layout').layout({west: {hiding: true}});
         var $inner_layout = $('#inner-layout').layout({type:'vertical', north: {sliding: true}});
         $('.ui-layout-pane-west .toggleSlide').button().click(function(e){
           e.preventDefault();
-          $outer_layout.layout('toggleSlide', 'west')
+          $outer_layout.layout('toggleSlide', 'west');
         });
         $inner_layout.bind('layoutnorthopen', function(e,data){
           var self = $inner_layout.data('layout')
@@ -28,10 +28,15 @@
 
         //set the margin to 0 after the west pane has been closed
         $('.ui-layout-pane-west').bind('mouseenter', function(){
-          $outer_layout.layout('open','west')
-        }).bind('mouseleave', function(){
-          $outer_layout.layout('close','west')
+          $outer_layout.layout('open','west');
         });
+
+        $outer_layout.bind('click',function(e){
+          if (!$(e.target).closest('.ui-layout-pane-west').length){
+            $outer_layout.layout('close','west');
+          }
+        });
+
       });
     </script>
     <style>
