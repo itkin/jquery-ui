@@ -29,7 +29,9 @@
       type: "horizontal", // vertical
       defaults: {
         closingWidth: 20,
-        closingHeight: 20
+        closingHeight: 20,
+        toggleEvent: 'click',
+        toggleSelector: '.ui-resizable-handle'
       },
       east: {
         selector: '.ui-layout-pane-east',
@@ -62,8 +64,9 @@
         resizable: { handles: 'n', maxHeight: 999999 }
       }
     },
+//  todo : method to be used in order to slide a pane on opening an closing action (instead of resizing it)
     _positionProp: function(pane){
-      var prop = ''
+      var prop ;
       switch(pane){
         case 'west': prop = 'left'; break;
         case 'east': prop = 'right'; break;
@@ -76,6 +79,7 @@
       prefix = prefix || '';
       return toCamelCase(prefix +" " + (this.options[pane].resizable.handles.match(/e|w/) ? 'width' : 'height') );
     },
+
     _create: function(){
       var self = this;
 
@@ -98,11 +102,11 @@
           // init side panes as resizable elements
           if (pane != 'center'){
 
+
             // init pane as rezisable element
             $pane.resizable($.extend({}, self.options[pane].resizable,{
               containment: 'parent'
             }));
-
 
             $pane.bind('resizestart', function(e,ui){
               self._open(pane)
@@ -136,11 +140,28 @@
                 self.resize();
             });
 
-            var preventToggling = false ;
+            var preventToggling = false;
+
             $pane.bind('resizestop', function(e,ui){
+
               // remove conflicting attributes
               self._removeInlineStyleAttr(pane);
+
+              // remove potential iframe mask
               $pane.children('div.iframe-mask').remove();
+
+
+              // prevent the pane to toggle after a mouseup event, if the orginal size has significantly been changed
+              if (Math.abs(ui.size[self._sizeProp(pane)] - ui.originalSize[self._sizeProp(pane)]) > 3){
+                preventToggling = true;
+                setTimeout(function(){
+                  preventToggling = false;
+                },100);
+              }
+              else{
+                return true;
+              }
+
 
               // close the sidePane if not visible anymore, otherwise record its dimension
               if (ui.size[self._sizeProp(pane)] < self.options[pane][self._sizeProp(pane, 'closing')]){
@@ -151,26 +172,24 @@
                 self.options[pane][self._sizeProp(pane)] = ui.size[self._sizeProp(pane)]
               }
 
-              //$pane.find('div.iframe-mask').remove();
-
-              // prevent the pane to toogle after a mouseup event
-              preventToggling = true;
-              setTimeout(function(){
-                preventToggling = false;
-              },100)
             });
 
             // toggle the pane if clicking on the handler 
             $pane.data('resizable')._handles
                 .append('<div class="ui-icon ui-icon-grip-dotted-'+ (self.options.type == 'horizontal' ? 'vertical' : 'horizontal') +'"></div>')
-                .bind('click', function(e){
-                  if (!preventToggling)
-                    self.toggle(pane);
-                });
+
+             $(self.options[pane].toggleSelector, $pane)
+                .bind(self.options[pane].toggleEvent, function(e){
+                    if (!preventToggling)
+                      self.toggle(pane);
+                })
           }
 
           self.panes[pane] = $pane ;
 
+
+          self._hiding(pane, self.options[pane].hiding) ;
+          
           // set pane dimension
           if(self.options[pane].sliding){
             self._sliding(pane)
@@ -201,6 +220,7 @@
         })
       }
     },
+
     _resizeElement: function(){
       var self = this;
 
@@ -284,32 +304,40 @@
       sliding = ("undefined" == typeof sliding) ? true : sliding;
       this.panes[pane][sliding ? 'addClass' : 'removeClass']('ui-layout-pane-sliding');
     },
+    _hiding: function(pane, hiding){
+      hiding = ("undefined" == typeof hiding) ? false : hiding;
+      this.panes[pane][hiding ? 'addClass' : 'removeClass']('ui-layout-pane-hiding');
+    },
     toggleSlide: function(pane){
       this.options[pane].sliding = !this.options[pane].sliding;
       this._sliding(pane, this.options[pane].sliding);
       this.resize();
       return this.element
     },
-    _pane:function(pane){
-      return {pane: this.panes[pane], name: pane}
+    _ui:function(pane){
+      return {pane: this.panes[pane], paneName: pane, options: this.options}
     },
+
+
     _open: function(pane, trigg){
       trigg = ("undefined" == typeof trigg ) ? true : trigg;
       this.panes[pane].addClass('ui-layout-pane-open')
+      this.panes[pane].removeClass('ui-layout-pane-close')
       this.options[pane].opened = true;
       if (trigg)
-        this._trigger(pane+'open', null, this._pane(pane));
+        this._trigger(pane+'open', null, this._ui(pane));
     },
     _opened: function(pane){
-      this._trigger(pane+'opened', null, this._pane(pane));
+      this._trigger(pane+'opened', null, this._ui(pane));
     },
     _close: function(pane){
-      this._trigger(pane+'close', null, this._pane(pane));
+      this._trigger(pane+'close', null, this._ui(pane));
     },
     _closed: function(pane){
       this.panes[pane].removeClass('ui-layout-pane-open')
+      this.panes[pane].addClass('ui-layout-pane-close')
       this.options[pane].opened = false;
-      this._trigger(pane+'closed', null, this._pane(pane));
+      this._trigger(pane+'closed', null, this._ui(pane));
     },
 
 
@@ -341,7 +369,6 @@
         $pane.attr('style', style);
       }
     },
-
 
     toggle: function(pane, callback){
       if (this.options[pane].opened)
@@ -393,12 +420,12 @@
             self.resize();
         },
         complete: function(){
+          if (callback){
+            callback();
+          }
           if (!self.options[pane].sliding){
             //self._putBackground(pane)
             self.resize();
-          }
-          if (callback){
-            callback();
           }
         }}
       );

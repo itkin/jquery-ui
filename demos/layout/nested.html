@@ -15,7 +15,7 @@
     <script type="text/javascript">
 
       $(document).ready(function () {
-        var $outer_layout = $('#outer-layout').layout({west: {sliding: true}});
+        var $outer_layout = $('#outer-layout').layout({west: {sliding: true, hiding: true}});
         var $inner_layout = $('#inner-layout').layout({type:'vertical', north: {sliding: true}});
         $('.ui-layout-pane-west .toggleSlide').button().click(function(e){
           e.preventDefault();
@@ -23,9 +23,15 @@
         });
         $inner_layout.bind('layoutnorthopen', function(e,data){
           var self = $inner_layout.data('layout')
-          self.options[data.name].height = self.panes['center'].outerHeight()+17
+          self.options[data.paneName].height = self.panes['center'].outerHeight() + 15
         });
 
+        //set the margin to 0 after the west pane has been closed
+        $('.ui-layout-pane-west').bind('mouseenter', function(){
+          $outer_layout.layout('open','west')
+        }).bind('mouseleave', function(){
+          $outer_layout.layout('close','west')
+        });
       });
     </script>
     <style>
@@ -39,9 +45,6 @@
         text-align: center;
         height: 100%;
         overflow:hidden;
-      }
-      a.toggleSlide.ui-button.ui-widget {
-        font-size: 75%;
       }
     </style>
   </HEAD>
