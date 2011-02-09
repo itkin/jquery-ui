@@ -15,8 +15,13 @@
     <script type="text/javascript">
 
       $(function () {
+
         var $outer_layout = $('#outer-layout').layout();
         var $inner_layout = $('#inner-layout').layout({type:'vertical', north: {sliding: true}});
+
+        // todo bug
+        $outer_layout.layout('resizeElement')
+
         $('.ui-layout-pane-west .toggleSlide').button().click(function(e){
           var self = $outer_layout.data('layout')
           e.preventDefault();
@@ -28,7 +33,7 @@
           self.options[data.paneName].height = self.panes['center'].outerHeight() + 15
         });
 
-        //set the margin to 0 after the west pane has been closed
+        
         $('.ui-layout-pane-west').bind('mouseenter', function(){
           var self = $outer_layout.data('layout');
           if (self.options['west'].sliding){

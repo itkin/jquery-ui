@@ -77,9 +77,9 @@
       }
       return prop
     },
-    _sizeProp: function(pane,prefix){
+    _sizeProp: function(prefix){
       prefix = prefix || '';
-      return toCamelCase(prefix +" " + (this.options[pane].resizable.handles.match(/e|w/) ? 'width' : 'height') );
+      return toCamelCase(prefix +" " + (this.options.type == 'horizontal' ? 'width' : 'height' ));
     },
 
     _create: function(){
@@ -114,7 +114,7 @@
               self._open(pane)
 
               // set max width/height dynamically
-              $pane.resizable('option', self._sizeProp(pane,'max'), self._maxSize(pane));
+              $pane.resizable('option', self._sizeProp('max'), self._maxSize(pane));
               if ($pane.find('iframe').length){
                 var $mask = $('<div class="iframe-mask"/>')
                 $mask
@@ -154,7 +154,7 @@
 
 
               // prevent the pane to toggle after a mouseup event, if the orginal size has significantly been changed
-              if (Math.abs(ui.size[self._sizeProp(pane)] - ui.originalSize[self._sizeProp(pane)]) > 3){
+              if (Math.abs(ui.size[self._sizeProp()] - ui.originalSize[self._sizeProp()]) > 3){
                 preventToggling = true;
                 setTimeout(function(){
                   preventToggling = false;
@@ -166,12 +166,12 @@
 
 
               // close the sidePane if not visible anymore, otherwise record its dimension
-              if (ui.size[self._sizeProp(pane)] < self.options[pane][self._sizeProp(pane, 'closing')]){
+              if (ui.size[self._sizeProp()] < self.options[pane][self._sizeProp('closing')]){
                 self.close(pane)
               }
               else {
                 self._opened(pane);
-                self.options[pane][self._sizeProp(pane)] = ui.size[self._sizeProp(pane)]
+                self.options[pane][self._sizeProp()] = ui.size[self._sizeProp()]
               }
 
             });
@@ -195,49 +195,50 @@
           // set pane dimension
           if(self.options[pane].sliding){
             self._sliding(pane)
-            $pane[self._sizeProp(pane)](0);
+            $pane[self._sizeProp()](0);
             self._closed(pane);
 
           }
           else if (self.options[pane].opened){
             self._open(pane, false);
-            $pane[self._sizeProp(pane,'outer')](self.options[pane][self._sizeProp(pane)], true)
+            $pane[self._sizeProp('outer')](self.options[pane][self._sizeProp()], true)
           }
                       
         }
       });
 
-      this._resizeElement();
-
       if (this.element.hasClass('ui-layout-pane')){
         this.element.bind('resize',function(e){
           if (e.target == self.element[0]){
-            self._resizeElement();
+            self.resizeElement();
           }
         })
       }
       else {
         $(window).bind('resize', function(e){
-          self._resizeElement();
+          self.resizeElement();
         })
       }
+
+      this.resizeElement();
+
     },
 
-    _resizeElement: function(){
+    resizeElement: function(){
       var self = this;
 
       if (this.element[0].tagName == "BODY"){
-        this.element
+        self.element
             .css({padding: '0', margin: '0'})
             .outerWidth($(window).width(), true)
             .outerHeight($(window).height(), true);
-      } else if(!this.element.hasClass('ui-layout-pane')) {
-        this.element
-            .outerHeight(this.element.parent().innerHeight(), true)
-            .outerWidth(this.element.parent().innerWidth(), true);
+      } else if(!self.element.hasClass('ui-layout-pane')) {
+        self.element
+            .outerHeight(self.element.parent().innerHeight(), true)
+            .outerWidth(self.element.parent().innerWidth(), true);
       } 
 
-      this._panes().each(function() {
+      self._panes().each(function() {
         if (self.options.type == 'horizontal')
           $(this).outerHeight(self.element.innerHeight(), true)
         else
@@ -245,34 +246,31 @@
       });
 
       // resize center pane
-      this.resize();
+      self.resize();
 
+      return this;
     },
     resize: function(){
       var self = this,
           $pane = this.panes['center'],
           $prev = $pane.prev('.ui-layout-pane');
 
-      var prefixedProp = function(prefix){
-        var prop = self.options.type == 'horizontal' ? 'width' : 'height';
-        return  toCamelCase('outer '+ prop)
-      }
-
-      var parseValue = function(text){
-        return parseInt(text.match(/-*\d+/))
-      }
-
       var sum = 0;
-      this.element.children(".ui-layout-pane:visible").not('.ui-layout-pane-center').each(function(){
-        sum+= $(this).hasClass('ui-layout-pane-sliding') ? $(this)[prefixedProp('outer')](true) - $(this)[prefixedProp('inner')]() :   $(this)[prefixedProp('outer')](true);
+      this.element.children(".ui-layout-pane").not('.ui-layout-pane-center').each(function(){
+        if ($(this).hasClass('ui-layout-pane-sliding')){
+          sum+= $(this)[self._sizeProp('outer')](true) - $(this)[self._sizeProp('inner')]()
+        }
+        else{
+          sum+= $(this)[self._sizeProp('outer')](true);
+        }
       });
 
-      $pane[prefixedProp('outer')](this.element[prefixedProp('max')]() - sum, true );
-
+      $pane[self._sizeProp('outer')](this.element[self._sizeProp('inner')]() - sum, true );
 
       var offset = function(){
         return self.options.type == 'horizontal' ? $prev.css('marginRight')+' 0' : '0 ' + $prev.css('marginBottom')
       }
+
       if ($prev.length && !$prev.hasClass('ui-layout-pane-sliding')){
         $pane.position({
           offset: offset(),
@@ -284,17 +282,19 @@
       }
       else{
         $pane.position({
-          offset: $prev.hasClass('ui-layout-pane-sliding') ? offset() : '',
+          offset: $prev.hasClass('ui-layout-pane-sliding') ? offset() : '0 0',
           of: this.element,
           my: 'left top',
-          at: 'left top'
+          at: 'left top',
+          collision: "none"
         })
       }
 
       this._trigger('resize')
       // emulate a resize event from the center pane
       $pane.trigger('resize');
-      return this.element
+
+      return this
     },
     _putForeground:function(pane){
       var $pane = this.panes[pane],
@@ -362,9 +362,9 @@
     _maxSize:function(pane){
       var options = this.options[pane],
           $pane = this.panes[pane],
-          property = this._sizeProp(pane)
+          property = this._sizeProp()
 
-      return Math.min(options.resizable[this._sizeProp(pane,'max')], this.element[this._sizeProp(pane,'inner')]() - ( this.options['center'].minWidth + this._panes().not($pane).not(this.panes['center'])[this._sizeProp(pane,'outer')](true) ))
+      return Math.min(options.resizable[this._sizeProp('max')], this.element[this._sizeProp('inner')]() - ( this.options['center'].minWidth + this._panes().not($pane).not(this.panes['center'])[this._sizeProp('outer')](true) ))
     },
 
     _removeInlineStyleAttr: function(pane){
@@ -398,7 +398,7 @@
           callback = callback || null ;
       if (this.options[pane].opened){
         this._close(pane)
-        css[self._sizeProp(pane)] = 0;
+        css[self._sizeProp()] = 0;
         this._animate(pane, css, function(){
           self._closed(pane);
           if (callback)
@@ -413,7 +413,7 @@
           css = {} ;
       if (!this.options[pane].opened){
         this._open(pane)
-        css[self._sizeProp(pane)] = Math.min(this.options[pane][this._sizeProp(pane)], this._maxSize(pane)) ;
+        css[self._sizeProp()] = Math.min(this.options[pane][this._sizeProp()], this._maxSize(pane)) ;
         this._animate(pane, css, function(){
           self._opened(pane)
           if (callback)
