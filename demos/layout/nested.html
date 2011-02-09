@@ -15,11 +15,13 @@
     <script type="text/javascript">
 
       $(function () {
-        var $outer_layout = $('#outer-layout').layout({west: {hiding: true}});
+        var $outer_layout = $('#outer-layout').layout();
         var $inner_layout = $('#inner-layout').layout({type:'vertical', north: {sliding: true}});
         $('.ui-layout-pane-west .toggleSlide').button().click(function(e){
+          var self = $outer_layout.data('layout')
           e.preventDefault();
-          $outer_layout.layout('toggleSlide', 'west');
+          $outer_layout.layout('option', 'west', 'sliding', !self.options['west'].sliding);
+          $outer_layout.layout('option', 'west', 'hiding', !self.options['west'].hiding);
         });
         $inner_layout.bind('layoutnorthopen', function(e,data){
           var self = $inner_layout.data('layout')
@@ -28,11 +30,15 @@
 
         //set the margin to 0 after the west pane has been closed
         $('.ui-layout-pane-west').bind('mouseenter', function(){
-          $outer_layout.layout('open','west');
+          var self = $outer_layout.data('layout');
+          if (self.options['west'].sliding){
+            $outer_layout.layout('open','west');
+          }
         });
 
         $outer_layout.bind('click',function(e){
-          if (!$(e.target).closest('.ui-layout-pane-west').length){
+          var self = $outer_layout.data('layout');
+          if (self.options['west'].sliding && !$(e.target).closest('.ui-layout-pane-west, .ui-resizable-handle').length){
             $outer_layout.layout('close','west');
           }
         });

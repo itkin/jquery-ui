@@ -40,38 +40,38 @@
 }
 
 .ui-layout-pane-west.ui-layout-pane-close.ui-layout-pane-hiding > .ui-resizable-e {
-  right: -1px;
-  width: 1px;
+  right: -5px;
+  width: 5px;
 }
 .ui-layout-pane-east.ui-layout-pane-close.ui-layout-pane-hiding > .ui-resizable-w {
-  left: -1px;
-  width: 1px;
+  left: -5px;
+  width: 5px;
 }
 .ui-layout-pane-south.ui-layout-pane-close.ui-layout-pane-hiding > .ui-resizable-n {
-  top: -1px;
-  width: 1px;
+  top: -5px;
+  width: 5px;
 }
 .ui-layout-pane-north.ui-layout-pane-close.ui-layout-pane-hiding > .ui-resizable-s {
-  bottom: -1px;
-  width: 1px;
+  bottom: -5px;
+  width: 5px;
 }
 
 
 .ui-layout-pane-west.ui-layout-pane-sliding.ui-layout-pane-hiding,
 .ui-layout-pane-west.ui-layout-pane-close.ui-layout-pane-hiding{
-  margin-right: 1px;
+  margin-right: 0;
 }
 .ui-layout-pane-east.ui-layout-pane-sliding.ui-layout-pane-hiding,
 .ui-layout-pane-east.ui-layout-pane-close.ui-layout-pane-hiding{
-  margin-left: 1px;
+  margin-left: 0;
 }
 .ui-layout-pane-north.ui-layout-pane-sliding.ui-layout-pane-hiding,
 .ui-layout-pane-north.ui-layout-pane-close.ui-layout-pane-hiding{
-  margin-bottom: 1px;
+  margin-bottom: 0;
 }
 .ui-layout-pane-south.ui-layout-pane-sliding.ui-layout-pane-hiding,
 .ui-layout-pane-south.ui-layout-pane-close.ui-layout-pane-hiding{
-  margin-bottom: 1px;
+  margin-bottom: 0;
 }
 
 

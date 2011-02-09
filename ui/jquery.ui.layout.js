@@ -30,6 +30,8 @@
       defaults: {
         closingWidth: 20,
         closingHeight: 20,
+        hiding: false,
+        sliding: false,
         toggleEvent: 'click',
         toggleSelector: '.ui-resizable-handle'
       },
@@ -188,7 +190,7 @@
           self.panes[pane] = $pane ;
 
 
-          self._hiding(pane, self.options[pane].hiding) ;
+          self._hiding(pane) ;
           
           // set pane dimension
           if(self.options[pane].sliding){
@@ -300,27 +302,37 @@
       this.options[pane].zIndex = $pane.zIndex();
       $pane.zIndex(this.element.zIndex() + 10 - depth)
     },
-    _sliding: function(pane, sliding){
-      sliding = ("undefined" == typeof sliding) ? true : sliding;
-      this.panes[pane][sliding ? 'addClass' : 'removeClass']('ui-layout-pane-sliding');
-      if (sliding)
+    _sliding: function(pane){
+      this.panes[pane][this.options[pane].sliding ? 'addClass' : 'removeClass']('ui-layout-pane-sliding');
+      if (this.options[pane].sliding)
         this._putForeground(pane);
     },
-    toggleSlide: function(pane){
-      this.options[pane].sliding = !this.options[pane].sliding;
-      this._sliding(pane, this.options[pane].sliding);
-      this.resize();
-      return this.element
+    _hiding: function(pane){
+      this.panes[pane][this.options[pane].hiding ? 'addClass' : 'removeClass']('ui-layout-pane-hiding');
     },
-    _hiding: function(pane, hiding){
-      hiding = ("undefined" == typeof hiding) ? false : hiding;
-      this.panes[pane][hiding ? 'addClass' : 'removeClass']('ui-layout-pane-hiding');
-    },    
+    option: function( pane, key, value ) {
+      if ($.inArray(pane, ['center', 'north', 'south', 'east', 'west'])){
+        this.options[pane][key] = value;
+        switch(key){
+          case 'hiding':
+            this._hiding(pane);
+            this.resize();
+            break;
+          case 'sliding':
+            this._sliding(pane);
+            this.resize();
+            break;
+        }
+      }
+      else{
+        this._super('option', pane, key)
+      }
+      return this;
+	  },
+
     _ui:function(pane){
       return {pane: this.panes[pane], paneName: pane, options: this.options}
     },
-
-
     _open: function(pane, trigg){
       trigg = ("undefined" == typeof trigg ) ? true : trigg;
       this.panes[pane].addClass('ui-layout-pane-open')
